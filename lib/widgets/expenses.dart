@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_complete_guide/widgets/expenses_list/expenses_list.dart';
@@ -86,10 +87,11 @@ class _ExpenseState extends State<Expenses> {
       appBar: AppBar(
         title: const Text('Expense tracker'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: Icon(CupertinoIcons.add),
             onPressed: _openAddExpenseOverlay,
-          ),
+          )
         ],
       ),
       body: width < 600

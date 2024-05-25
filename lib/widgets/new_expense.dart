@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/models/expense.dart';
 
@@ -18,28 +21,46 @@ class _NewExpenseState extends State<NewExpense> {
   DateTime? _selectedDate;
   Category _selectedCategory = Category.leisure;
 
-  void _presentDatePicker() async {
-    final now = DateTime.now();
-    final firstDate = DateTime(now.year - 1, now.month, now.day);
-
-    final pickedDate = await showDatePicker(
+  void _presentDatePicker() {
+    showModalBottomSheet(
       context: context,
-      initialDate: now,
-      firstDate: firstDate,
-      lastDate: now,
+      builder: (BuildContext builder) {
+        return Container(
+          height: MediaQuery.of(context).copyWith().size.height / 3,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: DateTime.now(),
+            minimumYear: DateTime.now().year - 1,
+            maximumDate: DateTime.now(),
+            onDateTimeChanged: (DateTime newdate) {
+              setState(() {
+                _selectedDate = newdate;
+              });
+            },
+          ),
+        );
+      },
     );
-    setState(() {
-      _selectedDate = pickedDate;
-    });
   }
 
-  void _submitData() {
-    final enteredAmount = double.tryParse(_amountController.text);
-    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
-
-    if (_titleController.text.trim().isEmpty ||
-        amountIsInvalid ||
-        _selectedDate == null) {
+  void _showDialog() {
+    if (Platform.isIOS) {
+      showCupertinoDialog(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: const Text('Invalid input'),
+          content: const Text('Please enter valid title, amount and date'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -55,6 +76,17 @@ class _NewExpenseState extends State<NewExpense> {
           ],
         ),
       );
+    }
+  }
+
+  void _submitData() {
+    final enteredAmount = double.tryParse(_amountController.text);
+    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      _showDialog();
       return;
     }
 
@@ -85,7 +117,7 @@ class _NewExpenseState extends State<NewExpense> {
 
         return SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 36),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -94,51 +126,59 @@ class _NewExpenseState extends State<NewExpense> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: TextField(
+                        child: CupertinoTextField(
                           controller: _titleController,
                           maxLength: 50,
-                          decoration: InputDecoration(labelText: 'Title'),
+                          placeholder: 'Title',
                         ),
                       ),
                       SizedBox(width: 24),
                       Expanded(
-                        child: TextField(
+                        child: CupertinoTextField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            prefixText: '\$',
-                            labelText: 'Amount',
-                          ),
+                          placeholder: 'Amount',
                         ),
                       ),
                     ],
                   )
                 else
-                  TextField(
+                  CupertinoTextField(
                     controller: _titleController,
                     maxLength: 50,
-                    decoration: InputDecoration(labelText: 'Title'),
+                    placeholder: 'Title',
                   ),
                 if (width >= 600)
                   Row(
                     children: [
-                      DropdownButton(
-                        value: _selectedCategory,
-                        items: Category.values.map((category) {
-                          return DropdownMenuItem(
-                            value: category,
-                            child: Text(
-                              category.name.toUpperCase(),
+                      CupertinoButton(
+                        child: Text(_selectedCategory.name.toUpperCase()),
+                        onPressed: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                CupertinoActionSheet(
+                              title: const Text('Select Category'),
+                              actions: Category.values.map((category) {
+                                return CupertinoActionSheetAction(
+                                  child: Text(category.name.toUpperCase()),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      _selectedCategory = category;
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                              cancelButton: CupertinoActionSheetAction(
+                                child: const Text('Cancel'),
+                                isDefaultAction: true,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
                             ),
                           );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value == null) {
-                            return;
-                          }
-                          setState(() {
-                            _selectedCategory = value;
-                          });
                         },
                       ),
                       const SizedBox(width: 24),
@@ -152,10 +192,11 @@ class _NewExpenseState extends State<NewExpense> {
                                   ? 'No date selected'
                                   : formatter.format(_selectedDate!),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.calendar_month),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Icon(CupertinoIcons.calendar_badge_plus),
                               onPressed: _presentDatePicker,
-                            ),
+                            )
                           ],
                         ),
                       )
@@ -165,13 +206,10 @@ class _NewExpenseState extends State<NewExpense> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextField(
+                        child: CupertinoTextField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            prefixText: '\$',
-                            labelText: 'Amount',
-                          ),
+                          placeholder: 'Amount',
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -185,10 +223,11 @@ class _NewExpenseState extends State<NewExpense> {
                                   ? 'No date selected'
                                   : formatter.format(_selectedDate!),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.calendar_month),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: Icon(CupertinoIcons.calendar_badge_plus),
                               onPressed: _presentDatePicker,
-                            ),
+                            )
                           ],
                         ),
                       )
@@ -199,51 +238,69 @@ class _NewExpenseState extends State<NewExpense> {
                   Row(
                     children: [
                       const Spacer(),
-                      TextButton(
+                      CupertinoButton(
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Cancel'),
                       ),
-                      ElevatedButton(
-                        onPressed: _submitData,
+                      CupertinoButton.filled(
                         child: const Text('Add expense'),
+                        onPressed: _submitData,
                       ),
                     ],
                   )
                 else
                   Row(
                     children: [
-                      DropdownButton(
-                        value: _selectedCategory,
-                        items: Category.values.map((category) {
-                          return DropdownMenuItem(
-                            value: category,
-                            child: Text(
-                              category.name.toUpperCase(),
+                      CupertinoButton(
+                        child: Text(_selectedCategory.name.toUpperCase()),
+                        onPressed: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                CupertinoActionSheet(
+                              title: const Text('Select Category'),
+                              actions: Category.values.map((category) {
+                                return CupertinoActionSheetAction(
+                                  child: Text(category.name.toUpperCase()),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      _selectedCategory = category;
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                              cancelButton: CupertinoActionSheetAction(
+                                child: const Text('Cancel'),
+                                isDefaultAction: true,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
                             ),
                           );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value == null) {
-                            return;
-                          }
-                          setState(() {
-                            _selectedCategory = value;
-                          });
                         },
                       ),
                       const Spacer(),
-                      TextButton(
+                      CupertinoButton(
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Cancel'),
                       ),
-                      ElevatedButton(
-                        onPressed: _submitData,
-                        child: const Text('Add expense'),
-                      ),
+                      Container(
+                        height: 40, // Set the height to your desired value
+                        child: CupertinoButton.filled(
+                          padding: EdgeInsets.all(0), // Remove padding to fit in the container
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0), // Add padding to the text
+                            child: const Text('Add expense'),
+                          ),
+                          onPressed: _submitData,
+                        ),
+                      )
                     ],
                   )
               ],
