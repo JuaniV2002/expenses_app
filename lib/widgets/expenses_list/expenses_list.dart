@@ -16,43 +16,45 @@ class ExpensesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: expenses.length,
-      itemBuilder: (ctx, index) => Dismissible(
-        key: UniqueKey(),
-        background: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.error.withOpacity(0.8),
+    return SafeArea(
+      child: ListView.builder(
+        itemCount: expenses.length,
+        itemBuilder: (ctx, index) => Dismissible(
+          key: UniqueKey(),
+          background: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).colorScheme.error.withOpacity(0.8),
+            ),
+            child: const Icon(
+              CupertinoIcons.delete,
+              color: Colors.white,
+              size: 40,
+            ),
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            margin: Theme.of(context).cardTheme.margin,
           ),
-          child: const Icon(
-            CupertinoIcons.delete,
-            color: Colors.white,
-            size: 40,
+          secondaryBackground: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).colorScheme.error.withOpacity(0.8),
+            ),
+            child: const Icon(
+              CupertinoIcons.delete,
+              color: Colors.white,
+              size: 40,
+            ),
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 20),
+            margin: Theme.of(context).cardTheme.margin,
           ),
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          margin: Theme.of(context).cardTheme.margin,
-        ),
-        secondaryBackground: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.error.withOpacity(0.8),
+          onDismissed: (direction) {
+            onRemoveExpense(expenses[index]);
+          },
+          child: ExpenseItem(
+            expenses[index],
           ),
-          child: const Icon(
-            CupertinoIcons.delete,
-            color: Colors.white,
-            size: 40,
-          ),
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(left: 20),
-          margin: Theme.of(context).cardTheme.margin,
-        ),
-        onDismissed: (direction) {
-          onRemoveExpense(expenses[index]);
-        },
-        child: ExpenseItem(
-          expenses[index],
         ),
       ),
     );
