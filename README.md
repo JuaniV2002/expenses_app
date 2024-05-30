@@ -12,10 +12,26 @@ Whether you're looking to save money, stick to a budget, or just get a better un
 
 ## Screenshots
 
-<img src="/assets/images/expenses_app_pics/no_expenses.png" width="300">
-<img src="/assets/images/expenses_app_pics/datepicker.png" width="300">
-<img src="/assets/images/expenses_app_pics/categories.png" width="300">
-<img src="/assets/images/expenses_app_pics/expenses.png" width="300">
+## Screenshots
+
+<table>
+    <tr>
+        <td>
+            <img src="/assets/images/expenses_app_pics/no_expenses.png" width="300">
+        </td>
+        <td>
+            <img src="/assets/images/expenses_app_pics/datepicker.png" width="300">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="/assets/images/expenses_app_pics/categories.png" width="300">
+        </td>
+        <td>
+            <img src="/assets/images/expenses_app_pics/expenses.png" width="300">
+        </td>
+    </tr>
+</table>
 
 ## Try my app!
 The attached files **DO NOT** work as a standalone project, they are just the code I wrote (lib folder), pubspecs (dependencies) and assets (fonts to add style to the app).  
