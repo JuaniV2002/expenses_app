@@ -12,8 +12,6 @@ Whether you're looking to save money, stick to a budget, or just get a better un
 
 ## Screenshots
 
-## Screenshots
-
 <table>
     <tr>
         <td>
